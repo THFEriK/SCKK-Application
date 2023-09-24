@@ -12,5 +12,6 @@ namespace SCKK_APP_2023.Models
         public string Role { get; set; } = null!;
         public string Token { get; set; } = null!;
         public DateTime Expire { get; set; }
+        public DateTime Start { get; set; }
     }
 }
