@@ -1,0 +1,183 @@
+﻿<UserControl
+    x:Class="SCKK_APP_2023.Views.Components.NavigationBarComponent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SCKK_APP_2023.Views.Components"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignWidth="56"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style TargetType="ToolTip">
+
+            <Setter Property="Placement" Value="Right" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Width" Value="110" />
+            <Setter Property="Margin" Value="20,0,0,0" />
+            <Setter Property="Background" Value="#FF0B0711" />
+            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="Fonts/Roboto-Light.ttf #Roboto" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="PlacementRectangle" Value="60,0,0,0" />
+            <Setter Property="HorizontalOffset" Value="10" />
+            <Setter Property="VerticalOffset" Value="10" />
+            <Setter Property="HasDropShadow" Value="True" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+
+        </Style>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Width="56" Background="#FF0B0711">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Image
+            Grid.Row="0"
+            Width="50"
+            Margin="3,10,0,10"
+            HorizontalAlignment="Left"
+            Source="/Resources/logo.png"
+            Stretch="Fill"
+            StretchDirection="Both" />
+
+        <Button
+            Grid.Row="1"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding NavigateHomeCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Visibility="Hidden">
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="Home" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Főoldal" />
+            </Button.ToolTip>
+        </Button>
+        <Button
+            Grid.Row="2"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding NavigateLogManagerViewCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}">
+            <!--  Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"  -->
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="FileDocument" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Beolvasás" />
+            </Button.ToolTip>
+        </Button>
+        <Button
+            Grid.Row="3"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding NavigateFileManagerCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="Database" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Adatbázis" />
+            </Button.ToolTip>
+        </Button>
+        <Button
+            Grid.Row="4"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding NavigateKeyManagerCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Visibility="Hidden">
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="Accounts" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Felhasználók" />
+            </Button.ToolTip>
+        </Button>
+        <Button
+            Grid.Row="6"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding NavigateLoginCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Visibility="{Binding IsLoggedOut, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="Login" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Bejelentkezés" />
+            </Button.ToolTip>
+        </Button>
+
+
+        <Button
+            Grid.Row="7"
+            Height="60"
+            Padding="0"
+            Background="Transparent"
+            BorderThickness="0"
+            Command="{Binding LogoutCommand}"
+            Foreground="LightGray"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button.Content>
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Kind="Logout" />
+            </Button.Content>
+            <Button.ToolTip>
+                <ToolTip Content="Kijelentkezés" />
+            </Button.ToolTip>
+        </Button>
+    </Grid>
+</UserControl>

@@ -1,0 +1,48 @@
+﻿<Window
+    x:Class="SCKK_APP_2023.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:components="clr-namespace:SCKK_APP_2023.Views.Components"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SCKK_APP_2023"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:SCKK_APP_2023.ViewModels"
+    xmlns:views="clr-namespace:SCKK_APP_2023.Views"
+    Title="SCKK App"
+    Width="700"
+    Height="500"
+    MinWidth="900"
+    MinHeight="600"
+    Background="#FF201E2D"
+    Foreground="White"
+    mc:Ignorable="d">
+    <ContentControl Content="{Binding CurrentViewModel}">
+        <ContentControl.Resources>
+            <DataTemplate DataType="{x:Type viewmodels:LoginViewModel}">
+                <views:LoginView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:SingupViewModel}">
+                <views:SingupView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
+                <views:HomeView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:LogFileManagerViewModel}">
+                <views:LogFileManagerView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:LogFilterViewModel}">
+                <views:LogFilterView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:FileManagerViewModel}">
+                <views:FileManagerView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:KeyManagerViewModel}">
+                <views:KeyManagerView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:LayoutViewModel}">
+                <components:LayoutComponent />
+            </DataTemplate>
+        </ContentControl.Resources>
+    </ContentControl>
+</Window>
