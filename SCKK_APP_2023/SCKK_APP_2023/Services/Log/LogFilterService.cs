@@ -33,28 +33,36 @@ namespace SCKK_APP_2023.Services.Log
 
         public void Filter()
         {
-            _logStore.CurrentLog.Calls = new List<LogCallModel>();
-
-            _logStatusModels = new List<LogCallModel>();
-            _taxiLogs = new List<RawLogModel>();
-            _towLogs = new List<RawLogModel>();
-
-            using (var fs = new FileStream(System.IO.Path.Combine(_logStore.CurrentLog.LogPath, _logStore.CurrentLog.File.Name), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var sr = new StreamReader(fs, Encoding.Default))
-            {
-                string? line;
-                while ((line = sr.ReadLine()) != null)
-                    FilterType(new RawLogModel() { Lines = line.Split(' '), IsValidated = _logStore.CurrentLog.File.IsValidated });
-            }
-
+            InitializeLists();
+            ReadLogFile();
             FilterCalls();
             FilterAcceptedCalls();
             FilterCancelledCalls();
             FilterMisses();
             MergeCallToStatus();
             FilterEarlyCancelled();
-
             _logStore.CurrentLog.Calls = _logStatusModels.Concat(_logStore.CurrentLog.Calls).ToList();
+        }
+
+        private void InitializeLists()
+        {
+            _logStore.CurrentLog.Calls = new List<LogCallModel>();
+            _logStatusModels = new List<LogCallModel>();
+            _taxiLogs = new List<RawLogModel>();
+            _towLogs = new List<RawLogModel>();
+        }
+
+        private void ReadLogFile()
+        {
+            using (var fs = new FileStream(Path.Combine(_logStore.CurrentLog.LogPath, _logStore.CurrentLog.File.Name), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var sr = new StreamReader(fs, Encoding.Default))
+            {
+                string? line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    FilterType(new RawLogModel() { Lines = line.Split(' '), IsValidated = _logStore.CurrentLog.File.IsValidated });
+                }
+            }
         }
 
         private void FilterType(RawLogModel row)
