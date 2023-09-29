@@ -23,19 +23,25 @@ namespace SCKK_APP_2023.Services.Log
 
         public bool IsValidated(string path, string file, DateTime lastModified)
         {
-            // TODO: Hátulról keressen, mert van, hogy két üres sor van a végén nem csak egy
             string[] lines = File.ReadAllLines(System.IO.Path.Combine(path, file));
-            string lastLine = lines.Length > 1 ? lines[lines.Length - 1] : string.Empty;
-            lines = null;
 
-            const string dateFormat = "yyyy-MM-dd HH:mm:ss";
-            DateTime lastDate = DateTime.ParseExact(lastLine.Substring(1, 19), dateFormat, null);
-
-            if ((int)(lastModified - lastDate).TotalSeconds == 0)
+            for (int i = lines.Length - 1; i >= 0; i--)
             {
-                return true;
+                string line = lines[i].Trim();
+                if (!string.IsNullOrEmpty(line))
+                {
+                    const string dateFormat = "yyyy-MM-dd HH:mm:ss";
+                    DateTime lastDate = DateTime.ParseExact(line.Substring(1, 19), dateFormat, null);
+
+                    if ((int)(lastModified - lastDate).TotalSeconds == 0)
+                    {
+                        return true;
+                    }
+                    break;
+                }
             }
-            return true;
+
+            return false;
         }
     }
 }
