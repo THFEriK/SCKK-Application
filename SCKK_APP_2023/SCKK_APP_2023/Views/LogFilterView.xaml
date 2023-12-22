@@ -118,8 +118,7 @@
                 <Button
                     Command="{Binding UploadCommand}"
                     Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
-                    ToolTip="MaterialDesignFloatingActionDarkButton"
-                    Visibility="Hidden">
+                    ToolTip="MaterialDesignFloatingActionDarkButton">
                     <materialDesign:PackIcon
                         Width="26"
                         Height="26"
