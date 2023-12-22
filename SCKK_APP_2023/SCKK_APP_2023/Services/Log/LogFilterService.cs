@@ -23,7 +23,7 @@ namespace SCKK_APP_2023.Services.Log
         private List<RawLogModel> _taxiLogs = new List<RawLogModel>();
         private List<RawLogModel> _towLogs = new List<RawLogModel>();
 
-        private List<LogCallModel> _logStatusModels = new List<LogCallModel>();
+        private List<LogStatusModel> _logStatusModels = new List<LogStatusModel>();
         private List<LogCallModel> _logCallModels = new List<LogCallModel>();
 
         public LogFilterService(LogStore logStore)
@@ -38,16 +38,18 @@ namespace SCKK_APP_2023.Services.Log
             FilterCalls();
             FilterAcceptedCalls();
             FilterCancelledCalls();
-            FilterMisses();
-            MergeCallToStatus();
-            FilterEarlyCancelled();
-            _logStore.CurrentLog.Calls = _logStatusModels.Concat(_logStore.CurrentLog.Calls).ToList();
+            //FilterMisses();
+            //MergeCallToStatus();
+            //FilterEarlyCancelled();
+            _logStore.CurrentLog.Calls = _logCallModels.Concat(_logStore.CurrentLog.Calls).ToList();
+            _logStore.CurrentLog.Statuses = _logStatusModels.Concat(_logStore.CurrentLog.Statuses).ToList();
         }
 
         private void InitializeLists()
         {
             _logStore.CurrentLog.Calls = new List<LogCallModel>();
-            _logStatusModels = new List<LogCallModel>();
+            _logStore.CurrentLog.Statuses = new List<LogStatusModel>();
+            _logStatusModels = new List<LogStatusModel>();
             _taxiLogs = new List<RawLogModel>();
             _towLogs = new List<RawLogModel>();
         }
@@ -73,7 +75,7 @@ namespace SCKK_APP_2023.Services.Log
                 {
                     _taxiLogs.Add(row);
                 }
-                if (row.Lines[7].StartsWith("(Autúmentő)]:"))
+                if (row.Lines[7].StartsWith("(Autómentő)]:"))
                 {
                     _towLogs.Add(row);
                 }
@@ -83,20 +85,38 @@ namespace SCKK_APP_2023.Services.Log
         {
             foreach (RawLogModel row in _taxiLogs)
             {
-                if (row.Lines.Contains("érkezett:") && row.Lines.Contains("hívás"))
+                if (row.Lines.Contains("hívás") && row.Lines.Contains("érkezett:"))
                 {
                     LogCallModel tmp = new LogCallModel();
 
                     tmp.CallTime = Time(row.Lines[0], row.Lines[1]);
-                    tmp.StatusTime = Time(row.Lines[0], row.Lines[1]);
                     tmp.Identifier = ushort.Parse(row.Lines[11]);
-                    tmp.Driver = "Beérkezés";
-                    tmp.Status = CallStatus.Unknown;
                     tmp.IsValidated = row.IsValidated;
 
                     FilterDistrictByCallTime(tmp);
                 }
             }
+        }
+
+        private void FilterDistrictByStatusTime(LogStatusModel call)
+        {
+            bool isContain = false;
+            for (int i = 0; i < _logStatusModels.Count; i++)
+            {
+                if (_logStatusModels[i].Identifier == call.Identifier && (_logStatusModels[i].StatusTime - call.StatusTime).TotalMinutes < 1)
+                {
+                    if (_logStatusModels[i].IsValidated == false && call.IsValidated == true)
+                    {
+                        _logStatusModels[i].Driver = call.Driver;
+                        _logStatusModels[i].Status = call.Status;
+                        _logStatusModels[i].StatusTime = call.StatusTime;
+                        _logStatusModels[i].IsValidated = true;
+                    }
+                    isContain = true;
+                }
+            }
+            if (!isContain)
+                _logStatusModels.Add(call);
         }
 
         private void FilterDistrictByCallTime(LogCallModel call)
@@ -109,9 +129,6 @@ namespace SCKK_APP_2023.Services.Log
                     if (_logCallModels[i].IsValidated == false && call.IsValidated == true)
                     {
                         _logCallModels[i].CallTime = call.CallTime;
-                        _logCallModels[i].Driver = call.Driver;
-                        _logCallModels[i].Status = call.Status;
-                        _logCallModels[i].StatusTime = call.StatusTime;
                         _logCallModels[i].IsValidated = true;
                     }
                     isContain = true;
@@ -129,7 +146,7 @@ namespace SCKK_APP_2023.Services.Log
 
                 if (row.Lines.Contains("elfogadta"))
                 {
-                    LogCallModel tmp = new LogCallModel();
+                    LogStatusModel tmp = new LogStatusModel();
 
                     tmp.Status = CallStatus.Accepted;
                     tmp.StatusTime = Time(row.Lines[0], row.Lines[1]);
@@ -154,12 +171,13 @@ namespace SCKK_APP_2023.Services.Log
                             // handle unexpected row
                             break;
                     }
+                    /*
                     bool isContain = false;
                     for (int i = 0; i < _logStatusModels.Count; i++)
                     {
                         if (_logStatusModels[i].Identifier == tmp.Identifier
                             && _logStatusModels[i].Status == CallStatus.Unknown
-                            && (_logStatusModels[i].CallTime - tmp.StatusTime).TotalMinutes < 20)
+                            && (_logStatusModels[i].StatusTime - tmp.StatusTime).TotalMinutes < 20)
                         {
                             _logStatusModels[i].Status = tmp.Status;
                             _logStatusModels[i].StatusTime = tmp.StatusTime;
@@ -171,7 +189,9 @@ namespace SCKK_APP_2023.Services.Log
                     if (!isContain)
                     {
                         FilterDistrictByStatusTime(tmp);
-                    }
+                    }*/
+
+                    FilterDistrictByStatusTime(tmp);
                 }
             }
         }
@@ -184,7 +204,7 @@ namespace SCKK_APP_2023.Services.Log
 
                 if (row.Lines.Contains("Törlődött") && row.Lines.Contains("hívás:"))
                 {
-                    LogCallModel tmp = new LogCallModel();
+                    LogStatusModel tmp = new LogStatusModel();
 
                     tmp.Status = CallStatus.Cancelled;
                     tmp.StatusTime = Time(row.Lines[0], row.Lines[1]);
@@ -197,7 +217,8 @@ namespace SCKK_APP_2023.Services.Log
                     {
                         if (_logStatusModels[i].Identifier == tmp.Identifier)
                         {
-                            if (_logStatusModels[i].Status == CallStatus.Unknown && (_logStatusModels[i].CallTime - tmp.StatusTime).TotalMinutes < 20)
+                            /*
+                            if (_logStatusModels[i].Status == CallStatus.Unknown && (_logStatusModels[i].StatusTime - tmp.StatusTime).TotalMinutes < 20)
                             {
                                 _logStatusModels[i].Status = tmp.Status;
                                 _logStatusModels[i].StatusTime = tmp.StatusTime;
@@ -205,7 +226,8 @@ namespace SCKK_APP_2023.Services.Log
                                 _logStatusModels[i].IsValidated = tmp.IsValidated;
                                 isContain = true;
                             }
-                            else if (_logStatusModels[i].Status == CallStatus.Accepted && (_logStatusModels[i].StatusTime - tmp.StatusTime).TotalMinutes < 60)
+                            else*/
+                            if (_logStatusModels[i].Status == CallStatus.Accepted && (_logStatusModels[i].StatusTime - tmp.StatusTime).TotalMinutes < 60)
                             {
                                 isContain = true;
                             }
@@ -219,27 +241,7 @@ namespace SCKK_APP_2023.Services.Log
             }
         }
 
-        private void FilterDistrictByStatusTime(LogCallModel call)
-        {
-            bool isContain = false;
-            for (int i = 0; i < _logStatusModels.Count; i++)
-            {
-                if (_logStatusModels[i].Identifier == call.Identifier && (_logStatusModels[i].StatusTime - call.StatusTime).TotalMinutes < 1)
-                {
-                    if (_logStatusModels[i].IsValidated == false && call.IsValidated == true)
-                    {
-                        _logStatusModels[i].StatusTime = call.StatusTime;
-                        _logStatusModels[i].Driver = call.Driver;
-                        _logStatusModels[i].Status = call.Status;
-                        _logStatusModels[i].IsValidated = call.IsValidated;
-                    }
-                    isContain = true;
-                }
-            }
-            if (!isContain)
-                _logStatusModels.Add(call);
-        }
-
+        /*
         private void MergeCallToStatus()
         {
             for (int i = 0; i < _logCallModels.Count; i++)
@@ -251,7 +253,7 @@ namespace SCKK_APP_2023.Services.Log
                 }
                 if (j < _logStatusModels.Count)
                 {
-                    _logStatusModels[j].CallTime = _logCallModels[i].CallTime;
+                    _logStatusModels[j].Status = _logCallModels[i].Status;
                     if (_logStatusModels[j].Status == CallStatus.Unknown)
                     {
                         _logStatusModels[j].Driver = _logCallModels[i].Driver;
@@ -264,22 +266,22 @@ namespace SCKK_APP_2023.Services.Log
                     }
                 }
             }
-        }
+        }*/
 
         private DateTime Time(string a, string b) => DateTime.ParseExact(a.TrimStart('[') + b.Remove(b.Length - 1), "yyyy-MM-ddHH:mm:ss", CultureInfo.InvariantCulture);
-
+        /*
         private void FilterEarlyCancelled()
         {
             for (int i = 0; i < _logStatusModels.Count; i++)
             {
-                if (_logStatusModels[i].Status == CallStatus.Cancelled && _logStatusModels[i].CallTime.AddMinutes(1) > _logStatusModels[i].StatusTime)
+                if (_logStatusModels[i].Status == CallStatus.Cancelled && _logStatusModels[i].StatusTime.AddMinutes(1) > _logStatusModels[i].StatusTime)
                 {
                     _logStatusModels[i].Status = CallStatus.EarlyCancelled;
                     _logStatusModels[i].Driver = "1 perces";
                 }
             }
-        }
-
+        }*/
+        /*
         private void FilterMisses()
         {
             if (_logStatusModels.Count > 10)
@@ -297,7 +299,7 @@ namespace SCKK_APP_2023.Services.Log
                     {
                         int y = 0;
                         while (missing[j] > _logStatusModels[y].Identifier) { y++; };
-                        LogCallModel rm_tmp = new LogCallModel();
+                        LogStatusModel rm_tmp = new LogStatusModel();
                         rm_tmp.CallTime = _logStatusModels[y].CallTime;
                         rm_tmp.StatusTime = _logStatusModels[y].StatusTime;
                         rm_tmp.Driver = "Hiányzó";
@@ -308,6 +310,6 @@ namespace SCKK_APP_2023.Services.Log
                     }
                 }
             }
-        }
+        }*/
     }
 }
