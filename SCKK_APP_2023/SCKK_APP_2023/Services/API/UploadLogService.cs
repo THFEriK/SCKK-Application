@@ -28,6 +28,23 @@ namespace SCKK_APP_2023.Services.API
             _accountStore = accountStore;
         }
 
+        public async Task UploadAsync(List<LogStatusModel> logCallModel)
+        {
+            if (logCallModel == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var logCallModelJson = JsonSerializer.Serialize(logCallModel);
+            var requestContent = new StringContent(logCallModelJson, Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await _httpClient.PostAsync($"{_baseUrl}/api/log", requestContent);
+            }
+            catch (Exception ex){ }
+        }
+
         public async Task UploadAsync(List<LogCallModel> logCallModel)
         {
             if (logCallModel == null)
@@ -38,9 +55,11 @@ namespace SCKK_APP_2023.Services.API
             var logCallModelJson = JsonSerializer.Serialize(logCallModel);
             var requestContent = new StringContent(logCallModelJson, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/api/log", requestContent);
-            
-            List<int> ints = new List<int>() { 1,2,34,5,6 };
+            try
+            {
+                var response = await _httpClient.PostAsync($"{_baseUrl}/api/log", requestContent);
+            }
+            catch (Exception ex) { }
         }
     }
 }
