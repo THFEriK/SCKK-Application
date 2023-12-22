@@ -20,8 +20,8 @@ namespace SCKK_APP_2023.ViewModels
         private readonly IConfiguration _configuration;
         public ICommand UploadCommand { get; }
 
-        private List<LogCallModel> _logCallModels;
-        public List<LogCallModel> LogCallModels
+        private List<LogStatusModel> _logCallModels;
+        public List<LogStatusModel> LogCallModels
         {
             get { return _logCallModels; }
             set { 
@@ -35,7 +35,7 @@ namespace SCKK_APP_2023.ViewModels
             _logStore = logStore;
             var LogFilterService = new LogFilterService(logStore);
             LogFilterService.Filter();
-            _logCallModels = _logStore.CurrentLog.Calls;
+            _logCallModels = _logStore.CurrentLog.Statuses;
             _configuration = configuration;
             UploadCommand = new UploadCommand(navigationService,logStore,this,accountStore);
         }
