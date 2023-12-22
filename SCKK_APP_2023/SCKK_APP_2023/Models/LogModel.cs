@@ -11,5 +11,6 @@ namespace SCKK_APP_2023.Models
         public string LogPath { get; set; }
         public LogFileModel File { get; set; } = new LogFileModel();
         public List<LogCallModel> Calls { get; set; } = new List<LogCallModel>();
+        public List<LogStatusModel> Statuses { get; set; } = new List<LogStatusModel>();
     }
 }

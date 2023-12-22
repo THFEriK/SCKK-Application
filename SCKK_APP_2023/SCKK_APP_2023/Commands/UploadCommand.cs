@@ -31,6 +31,7 @@ namespace SCKK_App.Commands
 
         public override async void Execute(object? parameter)
         {
+            await _logService.UploadAsync(_logStore.CurrentLog.Statuses);
             await _logService.UploadAsync(_logStore.CurrentLog.Calls);
         }
     }
